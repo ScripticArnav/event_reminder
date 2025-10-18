@@ -6,7 +6,7 @@ import path from 'path';
 
 import authRoutes from './routes/auth.js';
 import eventRoutes from './routes/eventRoutes.js';
-import startScheduler from './utils/sendReminderScheduler.js';
+// import startScheduler from './utils/sendReminderScheduler.js';
 
 // Load environment variables
 dotenv.config();
@@ -35,6 +35,6 @@ mongoose.connect(process.env.MONGO_URI)
       console.log('Server listening on', PORT);
     });
     // Start the reminders scheduler
-    startScheduler();
+    // startScheduler();
   })
   .catch(err => console.error('DB error', err));
