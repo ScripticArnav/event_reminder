@@ -6,37 +6,57 @@ import "./home.css";
 
 const Home = () => {
   const [time, setTime] = useState(new Date());
-  const [events, setEvents] = useState([
-    { 
-      id: 1, 
-      title: "Team Meeting", 
-      date: "2025-10-20", 
-      status: "Upcoming",
-      description: "Weekly team sync and project updates",
-      time: "10:00 AM"
-    },
-    { 
-      id: 2, 
-      title: "Project Review", 
-      date: "2025-10-25", 
-      status: "Upcoming",
-      description: "Quarterly project review and planning",
-      time: "2:00 PM"
-    },
-    { 
-      id: 3, 
-      title: "Client Presentation", 
-      date: "2025-10-22", 
-      status: "Upcoming",
-      description: "Present final deliverables to client",
-      time: "11:30 AM"
-    },
-  ]);
+  const [events, setEvents] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Load events from localStorage
+  useEffect(() => {
+    loadEvents();
+    
+    // Listen for storage changes (when events are added from dashboard)
+    const handleStorageChange = () => {
+      loadEvents();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check for changes every 2 seconds (for same-tab updates)
+    const interval = setInterval(loadEvents, 2000);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const loadEvents = () => {
+    try {
+      const localEvents = localStorage.getItem('events');
+      if (localEvents) {
+        const parsedEvents = JSON.parse(localEvents);
+        setEvents(parsedEvents);
+        
+        // Filter upcoming events (today and future)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const upcoming = parsedEvents.filter(event => {
+          const eventDate = new Date(event.date);
+          eventDate.setHours(0, 0, 0, 0);
+          return eventDate >= today;
+        }).sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        setUpcomingEvents(upcoming.slice(0, 6)); // Show max 6 upcoming events
+      }
+    } catch (error) {
+      console.error("Error loading events:", error);
+    }
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -199,8 +219,8 @@ const Home = () => {
               <div className="widget-icon">📅</div>
               <div className="widget-content">
                 <h3>Upcoming Events</h3>
-                <p className="events-count">{events.length}</p>
-                <p className="events-desc">This week</p>
+                <p className="events-count">{upcomingEvents.length}</p>
+                <p className="events-desc">Next events</p>
               </div>
             </motion.div>
           </div>
@@ -216,26 +236,42 @@ const Home = () => {
         viewport={{ once: true }}
       >
         <div className="container">
-          <h2 className="section-title">Recent Events</h2>
-          <motion.div
-            className="event-grid"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            viewport={{ once: true }}
-          >
-            {events.map((event, index) => (
-              <motion.div
-                key={event.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <EventCard event={event} />
-              </motion.div>
-            ))}
-          </motion.div>
+          <h2 className="section-title">Upcoming Events</h2>
+          {upcomingEvents.length > 0 ? (
+            <motion.div
+              className="event-grid"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              viewport={{ once: true }}
+            >
+              {upcomingEvents.map((event, index) => (
+                <motion.div
+                  key={event._id || event.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <EventCard event={event} />
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div
+              className="no-events-message"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              viewport={{ once: true }}
+            >
+              <div className="no-events-card">
+                <div className="no-events-icon">📅</div>
+                <h3>No upcoming events</h3>
+                <p>Create your first event to get started!</p>
+              </div>
+            </motion.div>
+          )}
           
           <motion.div 
             className="cta-section"
@@ -245,7 +281,7 @@ const Home = () => {
             viewport={{ once: true }}
           >
             <Link to="/dashboard" className="btn btn-primary btn-large">
-              View All Events
+              {upcomingEvents.length > 0 ? "View All Events" : "Create Your First Event"}
             </Link>
           </motion.div>
         </div>

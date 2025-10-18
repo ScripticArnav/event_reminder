@@ -435,7 +435,74 @@
   margin-top: 4rem;
 }
 
+/* No Events Message */
+.no-events-message {
+  display: flex;
+  justify-content: center;
+  margin: 4rem 0;
+}
+
+.no-events-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 25px;
+  padding: 4rem 3rem;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.no-events-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.7;
+}
+
+.no-events-card h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.no-events-card p {
+  opacity: 0.8;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .hero-section {
+    padding: 0 2rem;
+  }
+  
+  .hero-content {
+    padding: 0 2rem;
+  }
+  
+  .floating-cards {
+    width: 350px;
+    height: 350px;
+  }
+  
+  .features-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2.5rem;
+  }
+  
+  .dashboard-widgets {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2.5rem;
+  }
+  
+  .event-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2.5rem;
+  }
+}
+
 @media (max-width: 768px) {
   .hero-section {
     flex-direction: column;
@@ -510,6 +577,11 @@
   .events-section {
     padding: 6rem 0;
   }
+  
+  .no-events-card {
+    padding: 3rem 2rem;
+    margin: 0 1rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -525,6 +597,8 @@
     width: 100%;
     max-width: 280px;
     margin-bottom: 0.5rem;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
   }
 
   .hero-buttons {
@@ -555,6 +629,33 @@
 
   .container {
     padding: 0 1rem;
+  }
+  
+  .no-events-card {
+    padding: 2rem 1.5rem;
+    margin: 0 0.5rem;
+  }
+  
+  .no-events-icon {
+    font-size: 3rem;
+  }
+  
+  .no-events-card h3 {
+    font-size: 1.5rem;
+  }
+  
+  .no-events-card p {
+    font-size: 1rem;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+  }
+  
+  .features-section,
+  .dashboard-preview,
+  .events-section {
+    padding: 4rem 0;
   }
 }
 

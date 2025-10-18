@@ -4,12 +4,18 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+import TestDashboard from "./pages/TestDashboard";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import "./App.css";
 
 const PrivateRoute = ({ children }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>;
+  }
+  
   return user ? children : <Navigate to="/login" />;
 };
 
@@ -28,6 +34,10 @@ const App = () => (
               <Dashboard />
             </PrivateRoute>
           }
+        />
+        <Route
+          path="/test"
+          element={<TestDashboard />}
         />
       </Routes>
     </Router>
