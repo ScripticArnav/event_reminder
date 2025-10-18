@@ -1,0 +1,20 @@
+.auth-container {
+  text-align: center;
+  padding: 3rem;
+}
+.auth-container form {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 250px;
+}
+.auth-container input, button {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+}
+button {
+  background: #667eea;
+  color: white;
+  cursor: pointer;
+}
