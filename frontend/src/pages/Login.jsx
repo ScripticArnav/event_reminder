@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./auth.css";
 
@@ -27,28 +27,43 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-container">
-      <h2>Login</h2>
-      {error && <div className="error-message">{error}</div>}
-      <form onSubmit={handleLogin}>
-        <input 
-          type="email" 
-          placeholder="Email" 
-          required 
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
-        />
-        <input 
-          type="password" 
-          placeholder="Password" 
-          required 
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })} 
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h2>Welcome back</h2>
+          <p className="auth-subtitle">Sign in to manage your events and reminders</p>
+        </div>
+        {error && <div className="error-message">{error}</div>}
+        <form onSubmit={handleLogin} className="auth-form">
+          <div className="input-group">
+            <input 
+              type="email" 
+              placeholder="Email address" 
+              autoComplete="email"
+              required 
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
+            />
+          </div>
+          <div className="input-group">
+            <input 
+              type="password" 
+              placeholder="Password" 
+              autoComplete="current-password"
+              required 
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })} 
+            />
+          </div>
+          <button type="submit" disabled={loading} className="auth-button">
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
+        </form>
+        <div className="auth-meta">
+          <span>New here?</span>
+          <Link to="/signup" className="auth-link">Create an account</Link>
+        </div>
+      </div>
     </div>
   );
 };

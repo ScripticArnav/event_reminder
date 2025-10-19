@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import EventCard from "../components/EventCard";
 import { useAuth } from "../context/AuthContext";
 import "./dashboard.css";
@@ -90,57 +89,73 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="dashboard-container">
-      <h2>Welcome, {user?.name || user?.email || 'User'}!</h2>
-      <p>Total Events: {events.length}</p>
-      
+    <div className="dashboard-page">
+      <div className="dashboard-header">
+        <div>
+          <h2>Dashboard</h2>
+          <p className="muted">Welcome, {user?.name || user?.email || 'User'}</p>
+        </div>
+        <div className="stats-pill">Total events: {events.length}</div>
+      </div>
+
       {error && (
         <div className="error-message">
           {error}
         </div>
       )}
 
-      <button className="add-btn" onClick={() => setShowForm(!showForm)}>
-        + Create Event
-      </button>
+      <div className="card">
+        <button className="primary-btn" onClick={() => setShowForm(!showForm)}>
+          {showForm ? 'Close' : '+ Create Event'}
+        </button>
 
-      {showForm && (
-        <form onSubmit={addEvent} className="event-form">
-          <input
-            type="text"
-            placeholder="Event title"
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            required
-          />
-          <input
-            type="date"
-            value={form.date}
-            onChange={(e) => setForm({ ...form, date: e.target.value })}
-            required
-          />
-          <textarea
-            placeholder="Event description (optional)"
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-            rows="3"
-          />
-          <button type="submit">Add Event</button>
-        </form>
-      )}
-
-      <div className="event-grid">
-        {events.length > 0 ? (
-          events.map((event) => (
-            <EventCard 
-              key={event._id} 
-              event={event} 
-              onDelete={deleteEvent}
+        {showForm && (
+          <form onSubmit={addEvent} className="event-form">
+            <input
+              type="text"
+              placeholder="Event title"
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              required
             />
-          ))
-        ) : (
-          <p>No events yet. Create your first event!</p>
+            <input
+              type="date"
+              value={form.date}
+              onChange={(e) => setForm({ ...form, date: e.target.value })}
+              required
+            />
+            <textarea
+              placeholder="Event description (optional)"
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              rows="3"
+            />
+            <button type="submit" className="secondary-btn">Add Event</button>
+          </form>
         )}
+      </div>
+
+      <div className="card">
+        <div className="card-header">
+          <h3>Your Events</h3>
+          <span className="muted">Recently added appear first</span>
+        </div>
+        <div className="event-grid">
+          {events.length > 0 ? (
+            events
+              .slice()
+              .reverse()
+              .map((event) => (
+                <EventCard 
+                  key={event._id} 
+                  event={event} 
+                  onDelete={deleteEvent}
+                />
+              ))
+          ) : (
+            <p className="muted">No events yet. Create your first event!</p>
+          )}
+        </div>
       </div>
     </div>
   );
