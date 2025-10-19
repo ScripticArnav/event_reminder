@@ -1,5 +1,6 @@
 .dashboard-page {
   min-height: 100vh;
+  min-width: 100vw;
   padding: 24px;
   background: radial-gradient(1200px 600px at -10% 0%, #e8edff 0%, rgba(232,237,255,0) 70%),
               radial-gradient(1000px 500px at 110% 10%, #fff1e6 0%, rgba(255,241,230,0) 65%),
@@ -11,7 +12,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .muted {
@@ -27,13 +28,19 @@
   font-weight: 600;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .card {
   background: #ffffff;
   border: 1px solid #eef0f5;
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(16,24,40,0.06);
   padding: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .card-header {
@@ -43,7 +50,7 @@
   margin-bottom: 12px;
 }
 
-.primary-btn, .secondary-btn {
+.primary-btn, .secondary-btn, .add-btn {
   border: none;
   border-radius: 10px;
   padding: 10px 14px;
@@ -61,11 +68,16 @@
   color: #ffffff;
 }
 
+.add-btn {
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  color: #ffffff;
+}
+
 .event-form {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 10px;
-  margin-top: 12px;
+  margin: 12px 0 20px 0;
 }
 
 .event-form input, .event-form textarea {
@@ -73,6 +85,8 @@
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #fafafa;
+  color: #111827;
+  caret-color: #4f46e5;
 }
 
 .event-form input:focus, .event-form textarea:focus {
@@ -82,8 +96,12 @@
   box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
 }
 
+.event-form input::placeholder, .event-form textarea::placeholder {
+  color: #9ca3af;
+}
+
 .event-form textarea {
-  grid-column: 1 / -1;
+  flex: 1 1 100%;
   min-height: 64px;
   resize: vertical;
 }
@@ -91,7 +109,7 @@
 .event-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 14px;
+  gap: 16px;
 }
 
 .error-message {
@@ -106,7 +124,7 @@
 
 @media (max-width: 640px) {
   .event-form {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 }
  

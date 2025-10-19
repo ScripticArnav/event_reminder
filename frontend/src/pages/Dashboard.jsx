@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import EventCard from "../components/EventCard";
 import { useAuth } from "../context/AuthContext";
+import { eventsAPI } from "../utils/api";
 import "./dashboard.css";
 
 const Dashboard = () => {
@@ -16,75 +17,50 @@ const Dashboard = () => {
     loadEvents();
   }, []);
 
-  const loadEvents = () => {
+  const loadEvents = async () => {
     try {
-      console.log("Loading events from localStorage...");
-      const localEvents = localStorage.getItem('events');
-      if (localEvents) {
-        setEvents(JSON.parse(localEvents));
-        console.log("Events loaded from localStorage:", JSON.parse(localEvents));
-      } else {
-        setEvents([]);
-        console.log("No events found in localStorage");
-      }
+      setLoading(true);
+      setError("");
+      const data = await eventsAPI.getEvents();
+      setEvents(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("Error loading from localStorage:", error);
-      setEvents([]);
-      setError("Error loading events");
+      console.error("Error loading events from backend:", error);
+      setError(error.message || "Error loading events");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const addEvent = (e) => {
+  const addEvent = async (e) => {
     e.preventDefault();
-    console.log("Adding event:", form);
-    
     try {
       setError("");
-      
-      // Create new event
-      const newEvent = {
-        _id: Date.now().toString(),
+      setLoading(true);
+      const payload = {
         title: form.title,
         date: form.date,
         description: form.description || "",
-        createdAt: new Date().toISOString()
       };
-      
-      // Add to events array
-      const updatedEvents = [...events, newEvent];
-      setEvents(updatedEvents);
-      
-      // Save to localStorage
-      localStorage.setItem('events', JSON.stringify(updatedEvents));
-      
-      // Trigger storage event for home page updates
-      window.dispatchEvent(new Event('storage'));
-      
-      // Reset form
+      const created = await eventsAPI.createEvent(payload);
+      setEvents([...events, created]);
       setForm({ title: "", date: "", description: "" });
       setShowForm(false);
-      
-      console.log("Event added successfully:", newEvent);
     } catch (error) {
-      console.error("Error adding event:", error);
-      setError("Failed to add event");
+      console.error("Error adding event to backend:", error);
+      setError(error.message || "Failed to add event");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const deleteEvent = (id) => {
+  const deleteEvent = async (id) => {
     try {
-      console.log("Deleting event:", id);
-      const updatedEvents = events.filter(event => event._id !== id);
-      setEvents(updatedEvents);
-      localStorage.setItem('events', JSON.stringify(updatedEvents));
-      
-      // Trigger storage event for home page updates
-      window.dispatchEvent(new Event('storage'));
-      
-      console.log("Event deleted successfully");
+      setError("");
+      await eventsAPI.deleteEvent(id);
+      setEvents(events.filter(event => event._id !== id));
     } catch (error) {
-      console.error("Error deleting event:", error);
-      setError("Failed to delete event");
+      console.error("Error deleting event from backend:", error);
+      setError(error.message || "Failed to delete event");
     }
   };
 
@@ -95,7 +71,17 @@ const Dashboard = () => {
           <h2>Dashboard</h2>
           <p className="muted">Welcome, {user?.name || user?.email || 'User'}</p>
         </div>
-        <div className="stats-pill">Total events: {events.length}</div>
+        <div className="header-actions">
+          <div className="stats-pill">Total events: {events.length}</div>
+          <button
+            className="add-btn"
+            onClick={() => setShowForm((v) => !v)}
+            aria-expanded={showForm}
+            aria-controls="create-event-card"
+          >
+            {showForm ? 'Close' : '+ Create Event'}
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -104,36 +90,30 @@ const Dashboard = () => {
         </div>
       )}
 
-      <div className="card">
-        <button className="primary-btn" onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Close' : '+ Create Event'}
-        </button>
-
-        {showForm && (
-          <form onSubmit={addEvent} className="event-form">
-            <input
-              type="text"
-              placeholder="Event title"
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-              required
-            />
-            <input
-              type="date"
-              value={form.date}
-              onChange={(e) => setForm({ ...form, date: e.target.value })}
-              required
-            />
-            <textarea
-              placeholder="Event description (optional)"
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              rows="3"
-            />
-            <button type="submit" className="secondary-btn">Add Event</button>
-          </form>
-        )}
-      </div>
+      {showForm && (
+        <form onSubmit={addEvent} className="event-form" id="create-event-card">
+          <input
+            type="text"
+            placeholder="Event title"
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            required
+          />
+          <input
+            type="date"
+            value={form.date}
+            onChange={(e) => setForm({ ...form, date: e.target.value })}
+            required
+          />
+          <textarea
+            placeholder="Event description (optional)"
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            rows="3"
+          />
+          <button type="submit" className="secondary-btn">Add Event</button>
+        </form>
+      )}
 
       <div className="card">
         <div className="card-header">

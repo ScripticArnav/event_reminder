@@ -43,6 +43,8 @@
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   background: #fafafa;
+  color: #111827;
+  caret-color: #4f46e5;
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
@@ -51,6 +53,11 @@
   border-color: #6366f1;
   background: #ffffff;
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+}
+
+/* Placeholder color for better contrast */
+.input-group input::placeholder {
+  color: #9ca3af;
 }
 
 .auth-button {

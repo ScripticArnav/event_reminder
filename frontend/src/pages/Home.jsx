@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import EventCard from "../components/EventCard";
 import { motion } from "framer-motion";
+import { eventsAPI } from "../utils/api";
 import "./home.css";
 
 const Home = () => {
@@ -14,45 +15,55 @@ const Home = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Load events from localStorage
+  // Load events: prefer backend if logged in, otherwise fallback to localStorage
   useEffect(() => {
-    loadEvents();
+    const load = async () => {
+      await loadEvents();
+    };
+    load();
     
-    // Listen for storage changes (when events are added from dashboard)
     const handleStorageChange = () => {
       loadEvents();
     };
-    
     window.addEventListener('storage', handleStorageChange);
     
-    // Also check for changes every 2 seconds (for same-tab updates)
-    const interval = setInterval(loadEvents, 2000);
-    
+    const interval = setInterval(loadEvents, 4000);
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       clearInterval(interval);
     };
   }, []);
 
-  const loadEvents = () => {
+  const loadEvents = async () => {
     try {
-      const localEvents = localStorage.getItem('events');
-      if (localEvents) {
-        const parsedEvents = JSON.parse(localEvents);
-        setEvents(parsedEvents);
-        
-        // Filter upcoming events (today and future)
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        const upcoming = parsedEvents.filter(event => {
+      const token = localStorage.getItem('token');
+      let sourceEvents = [];
+      if (token) {
+        try {
+          const data = await eventsAPI.getEvents();
+          sourceEvents = Array.isArray(data) ? data : [];
+        } catch (e) {
+          // If API fails, fall back to localStorage silently
+          const localEvents = localStorage.getItem('events');
+          sourceEvents = localEvents ? JSON.parse(localEvents) : [];
+        }
+      } else {
+        const localEvents = localStorage.getItem('events');
+        sourceEvents = localEvents ? JSON.parse(localEvents) : [];
+      }
+
+      setEvents(sourceEvents);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const upcoming = sourceEvents
+        .filter((event) => {
           const eventDate = new Date(event.date);
           eventDate.setHours(0, 0, 0, 0);
           return eventDate >= today;
-        }).sort((a, b) => new Date(a.date) - new Date(b.date));
-        
-        setUpcomingEvents(upcoming.slice(0, 6)); // Show max 6 upcoming events
-      }
+        })
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+      setUpcomingEvents(upcoming.slice(0, 6));
     } catch (error) {
       console.error("Error loading events:", error);
     }
