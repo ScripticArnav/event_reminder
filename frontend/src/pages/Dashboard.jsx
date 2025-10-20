@@ -115,11 +115,8 @@ const Dashboard = () => {
         </form>
       )}
 
-      <div className="card">
-        <div className="card-header">
-          <h3>Your Events</h3>
-          <span className="muted">Recently added appear first</span>
-        </div>
+      <div>
+        
         <div className="event-grid">
           {events.length > 0 ? (
             events
